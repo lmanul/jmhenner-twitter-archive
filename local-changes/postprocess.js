@@ -23,7 +23,6 @@ const hideUnwantedNavItems = () => {
 
 const onFinishedLoading = () => {
     hideUnwantedNavItems();
-    edit
 };
 
 window.setTimeout(onFinishedLoading, 0);
