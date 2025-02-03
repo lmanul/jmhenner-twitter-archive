@@ -1,6 +1,7 @@
 const navBarTitlesToHide = [
     'Ads',
     'Direct Messages',
+    'Lists',
     'Moments',
     'Personalization',
     'Safety',
