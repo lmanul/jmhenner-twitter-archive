@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="icon" href="favicon.png" />
+        <style>
+            body {
+                background-color: #eee;
+                font-family: Arial;
+            }
+            #content {
+                margin: 0 auto;
+                max-width: 1200px;
+            }
+            /* Dates */
+            .d {
+                color: #aaa;
+            }
+            /* External links */
+            .e {
+                text-decoration: none;
+            }
+            /* Text */
+            .t {
+                background-color: #fff;
+                display: block;
+                margin: 1ex;
+                padding: 1ex;
+            }
+            /* Images */
+            .i {
+                margin: 1ex;
+                max-height: 200px;
+            }
+        </style>
+        <script>
+            let data;
+
+            const loadData = async () => {
+                const response = await fetch('data/pruned.json');
+                data = await response.json();
+
+                showData();
+            };
+
+            const formatTweet = (t) => {
+                let mediaMarkup = '';
+                if (t.media.length > 0) {
+                    console.log(t.media);
+                    for (let medium of t.media) {
+                        const mediaUrl = `data/tweets_media/${t.id}-${medium.id}`;
+                        if (medium.id.endsWith(".jpg")) {
+                            mediaMarkup += `<a href="${mediaUrl}"><img class="i" src="${mediaUrl}" /></a>`;
+                        }
+                        // if (medium.id.endsWith(".mp4")) {
+                        //     mediaMarkup += `<video width="320" height="240" controls><source src="${mediaUrl}" type="video/mp4"></video> `;
+                        // }
+                    }
+                }
+                return `<div class="t"><span class="txt">${t.text}</span> <span class="d">${t.created}</span> <a class="e" target="_blank" href="https://twitter.com/jmhenner/status/${t.id}">↗</a><div class="m">${mediaMarkup}</div><span></div>`;
+            };
+
+            const showData = async () => {
+                const contentEl = document.getElementById('content');
+                contentEl.innerHTML = '';
+
+                let output = [];
+                let count = 0;
+                for (let tweet of data) {
+                    output.push(formatTweet(tweet));
+                    count += 1;
+                }
+                contentEl.innerHTML = output.join('');
+            };
+
+        </script>
+    </head>
+    <body onload="loadData()">
+        <div id="content">Loading...</div>
+    </body>
+</html>

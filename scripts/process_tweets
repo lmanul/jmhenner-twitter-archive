@@ -1,0 +1,54 @@
+#!/usr/bin/python
+
+import json
+
+def produce_html(obj):
+    out = ""
+    out += "<html><body><ol>"
+
+    for tweet in sorted(obj, key=lambda t: t["popularity"]):
+        out += f"<li>{tweet["text"]}</li>"
+
+    out += "</ol></body></html>"
+    return out
+
+def format_date(s):
+    parts = s.split(" ")
+    return " ".join([parts[0], parts[1], parts[2], parts[5]])
+
+def main():
+    with open("data/tweets.js") as f:
+        o = json.loads(f.read()[26:])
+        pruned = []
+
+        for tweet in o:
+            inner_tweet = tweet["tweet"]
+            if inner_tweet["full_text"].startswith("RT @"):
+                continue
+            pruned_tweet = {}
+            pruned_tweet["text"] = inner_tweet["full_text"]
+            pruned_tweet["id"] = inner_tweet["id"]
+            popularity = int(inner_tweet["favorite_count"]) + int(inner_tweet["retweet_count"])
+            pruned_tweet["media"] = []
+            pruned_tweet["created"] = format_date(inner_tweet["created_at"])
+            if "entities" in inner_tweet and "media" in inner_tweet["entities"]:
+                for medium in inner_tweet["entities"]["media"]:
+                    pruned_medium = {}
+                    url = medium["media_url"]
+                    pruned_medium['id'] = url.split("/")[-1]
+                    if "video_thumb" in url:
+                        pruned_medium['id'] = pruned_medium['id'].replace(".jpg", ".mp4")
+                    pruned_tweet["media"].append(pruned_medium)
+            # if "extended_entities" in inner_tweet and "media" in inner_tweet["extended_entities"]:
+            #     pruned_tweet["media"] += inner_tweet["extended_entities"]["media"]
+            pruned_tweet["popularity"] = popularity
+            pruned.append(pruned_tweet)
+
+    # with open("popular.html", "w") as f:
+    #     f.write(produce_html(pruned))
+
+    with open("data/pruned.json", "w") as f:
+        json.dump(pruned, f)
+
+if __name__ == "__main__":
+    main()
