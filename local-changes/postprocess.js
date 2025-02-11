@@ -35,9 +35,27 @@ const hideUnwantedStats = () => {
     }
 };
 
+const addLinkToAllInOnePage = () => {
+    const container = document.querySelector('.css-1dbjc4n.r-15bsvpr.r-feyk0v');
+    if (!container) {
+        // Not finished loading yet. Try again soon.
+        window.setTimeout(addLinkToAllInOnePage, 10);
+        return;
+    }
+    const titleEl = document.createElement('div');
+    titleEl.classList.add('css-901oao', 'r-hkyrab', 'r-1qd0xha', 'r-a023e6', 'r-vw2c0b', 'r-ad9z0x', 'r-bcqeeo', 'r-qvutc0');
+    titleEl.textContent = 'Alternate view';
+    const linkEl = document.createElement('a');
+    linkEl.setAttribute('href', 'browse.html');
+    linkEl.textContent = 'Go to simplified view';
+    container.appendChild(titleEl);
+    container.appendChild(linkEl);
+};
+
 const onFinishedLoading = () => {
     hideUnwantedNavItems();
     hideUnwantedStats();
+    addLinkToAllInOnePage();
 };
 
 window.setTimeout(onFinishedLoading, 0);
