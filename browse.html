@@ -7,6 +7,10 @@
                 background-color: #eee;
                 font-family: Arial;
             }
+
+            #settings {
+                margin: 1ex;
+            }
             #content {
                 margin: 0 auto;
                 max-width: 1200px;
@@ -33,13 +37,18 @@
             }
         </style>
         <script>
-            let data;
+            let dataSortedByDate;
+            let dataSortedByPopularity;
 
             const loadData = async () => {
                 const response = await fetch('data/pruned.json');
-                data = await response.json();
+                dataSortedByDate = await response.json();
+                dataSortedByPopularity = [...dataSortedByDate];
 
-                showData();
+                dataSortedByPopularity.sort((a, b) => {
+                    return b['popularity'] - a['popularity'];
+                });
+                showData(dataSortedByPopularity);
             };
 
             const formatTweet = (t) => {
@@ -59,22 +68,36 @@
                 return `<div class="t"><span class="txt">${t.text}</span> <span class="d">${t.created}</span> <a class="e" target="_blank" href="https://twitter.com/jmhenner/status/${t.id}">↗</a><div class="m">${mediaMarkup}</div><span></div>`;
             };
 
-            const showData = async () => {
+            const showData = async (dataToShow) => {
                 const contentEl = document.getElementById('content');
                 contentEl.innerHTML = '';
 
                 let output = [];
                 let count = 0;
-                for (let tweet of data) {
+                for (let tweet of dataToShow) {
                     output.push(formatTweet(tweet));
                     count += 1;
                 }
                 contentEl.innerHTML = output.join('');
             };
 
+            const sortByDate = () => {
+                showData(dataSortedByDate);
+            };
+            const sortByPopularity = () => {
+                showData(dataSortedByPopularity);
+            };
+
         </script>
     </head>
     <body onload="loadData()">
+        <div id="settings">
+            Sort Tweets by:
+            <input type="radio" name="sort" id="popularity" checked onclick="sortByPopularity()" />
+            <label for="popularity">Popularity</label>
+            <input type="radio" name="sort" id="date" onclick="sortByDate()" />
+            <label for="date">Date</label>
+        </div>
         <div id="content">Loading...</div>
     </body>
 </html>

@@ -2,16 +2,6 @@
 
 import json
 
-def produce_html(obj):
-    out = ""
-    out += "<html><body><ol>"
-
-    for tweet in sorted(obj, key=lambda t: t["popularity"]):
-        out += f"<li>{tweet["text"]}</li>"
-
-    out += "</ol></body></html>"
-    return out
-
 def format_date(s):
     parts = s.split(" ")
     return " ".join([parts[0], parts[1], parts[2], parts[5]])
