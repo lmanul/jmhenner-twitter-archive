@@ -9,8 +9,11 @@
             }
 
             #topbar {
+                align-items: center;
+                background-color: rgba(0, 0, 0, 0.1);
                 display: flex;
                 justify-content: space-between;
+                padding: 1ex;
             }
             #settings {
                 margin: 1ex;
@@ -43,6 +46,8 @@
         <script>
             let dataSortedByDate;
             let dataSortedByPopularity;
+            let chosenData = dataSortedByPopularity;
+            let limit = 1000;
 
             const loadData = async () => {
                 const response = await fetch('data/pruned.json');
@@ -52,13 +57,13 @@
                 dataSortedByPopularity.sort((a, b) => {
                     return b['popularity'] - a['popularity'];
                 });
-                showData(dataSortedByPopularity);
+                chosenData = dataSortedByPopularity;
+                showData();
             };
 
             const formatTweet = (t) => {
                 let mediaMarkup = '';
                 if (t.media.length > 0) {
-                    console.log(t.media);
                     for (let medium of t.media) {
                         const mediaUrl = `data/tweets_media/${t.id}-${medium.id}`;
                         if (medium.id.endsWith(".jpg")) {
@@ -72,25 +77,41 @@
                 return `<div class="t"><span class="txt">${t.text}</span> <span class="d">${t.created}</span> <a class="e" target="_blank" href="https://twitter.com/jmhenner/status/${t.id}">↗</a><div class="m">${mediaMarkup}</div><span></div>`;
             };
 
-            const showData = async (dataToShow) => {
+            const showData = async () => {
                 const contentEl = document.getElementById('content');
                 contentEl.innerHTML = '';
 
                 let output = [];
                 let count = 0;
-                for (let tweet of dataToShow) {
+                for (let tweet of chosenData) {
                     output.push(formatTweet(tweet));
                     count += 1;
+                    if (limit > 0 && count > limit) {
+                        break;
+                    }
                 }
                 contentEl.innerHTML = output.join('');
             };
 
             const sortByDate = () => {
-                showData(dataSortedByDate);
+                chosenData = dataSortedByDate;
+                showData();
             };
             const sortByPopularity = () => {
-                showData(dataSortedByPopularity);
+                chosenData = dataSortedByPopularity;
+                showData();
             };
+
+            const updateLimit = () => {
+                const checkbox = document.getElementById('limit');
+                console.log(checkbox.checked);
+                if (checkbox.checked) {
+                    limit = 1000;
+                } else {
+                    limit = 0;
+                }
+                showData();
+            }
 
         </script>
     </head>
@@ -102,6 +123,10 @@
                 <label for="popularity">Popularity</label>
                 <input type="radio" name="sort" id="date" onclick="sortByDate()" />
                 <label for="date">Date</label>
+            </div>
+            <div id="more-settings">
+                <input type="checkbox" checked id="limit" onclick="updateLimit()" />
+                <label for="limit" onclick="updateLimit()">Show at most 1000 Tweets</span>
             </div>
             <div id="links"><a href="archive.html">Go to "Archive" view</a></div>
         </div>
