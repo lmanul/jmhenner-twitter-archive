@@ -1,3 +1,6 @@
+let observing = false;
+let lastUpdate = 0;
+
 const navBarTitlesToHide = [
     'Ads',
     'Direct Messages',
@@ -6,6 +9,28 @@ const navBarTitlesToHide = [
     'Personalization',
     'Safety',
 ];
+
+const observeDOM = (function() {
+    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+    return function(obj, callback) {
+      if (!obj || obj.nodeType !== 1) {
+        return;
+      }
+
+      if (MutationObserver) {
+        // define a new observer
+        var mutationObserver = new MutationObserver(callback);
+
+        // have the observer observe for changes in children
+        mutationObserver.observe(obj, {childList: true, subtree: true});
+        return mutationObserver;
+      } else if (window.addEventListener) { // browser support fallback
+        obj.addEventListener('DOMNodeInserted', callback, false);
+        obj.addEventListener('DOMNodeRemoved', callback, false);
+      }
+    }
+  })();
 
 const hideUnwantedHeader = () => {
     const header = document.querySelector('.css-1dbjc4n.r-1u4rsef.r-18u37iz.r-1x0uki6.r-15bsvpr.r-13qz1uu');
@@ -46,6 +71,11 @@ const hideUnwantedStats = () => {
 };
 
 const addLinkToAllInOnePage = () => {
+    const existing = document.querySelector('#simplified-link');
+    if (existing) {
+        // Already there, nothing to do.
+        return;
+    }
     const container = document.querySelector('.css-1dbjc4n.r-15bsvpr.r-feyk0v');
     if (!container) {
         // Not finished loading yet. Try again soon.
@@ -57,16 +87,29 @@ const addLinkToAllInOnePage = () => {
     titleEl.textContent = 'Alternate view';
     const linkEl = document.createElement('a');
     linkEl.setAttribute('href', 'index.html');
+    linkEl.setAttribute('id', 'simplified-link');
     linkEl.textContent = 'Go to simplified view';
     container.appendChild(titleEl);
     container.appendChild(linkEl);
 };
 
 const onFinishedLoading = () => {
+    let now = new Date().getTime();
+    if (now - lastUpdate < 2000) {
+        // Throttle
+        return;
+    }
     hideUnwantedHeader();
     hideUnwantedNavItems();
     hideUnwantedStats();
     addLinkToAllInOnePage();
+    if (!observing) {
+        window.setTimeout(() => {
+            observeDOM(document.body, onFinishedLoading);
+            observing = true;
+        }, 1000);
+    }
+    lastUpdate = now;
 };
 
 window.setTimeout(onFinishedLoading, 0);
