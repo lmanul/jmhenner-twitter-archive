@@ -7,6 +7,16 @@ const navBarTitlesToHide = [
     'Safety',
 ];
 
+const hideUnwantedHeader = () => {
+    const header = document.querySelector('.css-1dbjc4n.r-1u4rsef.r-18u37iz.r-1x0uki6.r-15bsvpr.r-13qz1uu');
+    if (header) {
+        header.style.display = 'none';
+    } else {
+        // Not finished loading yet. Try again soon.
+        window.setTimeout(hideUnwantedHeader, 10);
+    }
+};
+
 const hideUnwantedNavItems = () => {
     const navBarItems = document.querySelectorAll('[role="menuitem"]');
     if (navBarItems.length === 0) {
@@ -53,6 +63,7 @@ const addLinkToAllInOnePage = () => {
 };
 
 const onFinishedLoading = () => {
+    hideUnwantedHeader();
     hideUnwantedNavItems();
     hideUnwantedStats();
     addLinkToAllInOnePage();
