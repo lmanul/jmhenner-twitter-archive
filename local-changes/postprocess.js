@@ -72,7 +72,7 @@ const hideUnwantedStats = () => {
 };
 
 const addLinkToAllInOnePage = () => {
-    const existing = document.querySelector('#simplified-link');
+    const existing = document.querySelector('#extras');
     if (existing) {
         // Already there, nothing to do.
         return;
@@ -83,15 +83,18 @@ const addLinkToAllInOnePage = () => {
         window.setTimeout(addLinkToAllInOnePage, 10);
         return;
     }
-    const titleEl = document.createElement('div');
-    titleEl.classList.add('css-901oao', 'r-hkyrab', 'r-1qd0xha', 'r-a023e6', 'r-vw2c0b', 'r-ad9z0x', 'r-bcqeeo', 'r-qvutc0');
-    titleEl.textContent = 'Alternate view';
-    const linkEl = document.createElement('a');
-    linkEl.setAttribute('href', 'simple.html');
-    linkEl.setAttribute('id', 'simplified-link');
-    linkEl.textContent = 'Go to simplified view';
-    container.appendChild(titleEl);
-    container.appendChild(linkEl);
+
+    const addedLinks = document.createElement('div');
+    addedLinks.setAttribute('id', 'extras');
+    addedLinks.innerHTML = `
+        <div class="css-901oao r-hkyrab r-1qd0xha r-a023e6 r-vw2c0b r-ad9z0x r-bcqeeo r-qvutc0">Other links</div>
+        <ul>
+            <li><a href="simple.html">Simplified view</a></li>
+            <li>If you enjoy "hennerisms" <a href="https://aff432.myshopify.com/">click here</a> for the shopify page to order stickers, magnets and other items with proceeds supporting a forthcoming scholarship.</li>
+        </ul>
+    `;
+
+    container.appendChild(addedLinks);
 };
 
 const onFinishedLoading = () => {
