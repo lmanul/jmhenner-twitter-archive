@@ -86,7 +86,7 @@ const addLinkToAllInOnePage = () => {
     titleEl.classList.add('css-901oao', 'r-hkyrab', 'r-1qd0xha', 'r-a023e6', 'r-vw2c0b', 'r-ad9z0x', 'r-bcqeeo', 'r-qvutc0');
     titleEl.textContent = 'Alternate view';
     const linkEl = document.createElement('a');
-    linkEl.setAttribute('href', 'index.html');
+    linkEl.setAttribute('href', 'simple.html');
     linkEl.setAttribute('id', 'simplified-link');
     linkEl.textContent = 'Go to simplified view';
     container.appendChild(titleEl);
