@@ -4,6 +4,7 @@ let lastUpdate = 0;
 const navBarTitlesToHide = [
     'Ads',
     'Direct Messages',
+    'Likes',
     'Lists',
     'Moments',
     'Personalization',
