@@ -1,136 +1,45 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="favicon.png" />
-        <style>
-            body {
-                background-color: #eee;
-                font-family: Arial;
-            }
 
-            #topbar {
-                align-items: center;
-                background-color: rgba(0, 0, 0, 0.1);
-                display: flex;
-                justify-content: space-between;
-                padding: 1ex;
-            }
-            #settings {
-                margin: 1ex;
-            }
-            #content {
-                margin: 0 auto;
-                max-width: 1200px;
-            }
-            /* Dates */
-            .d {
-                color: #aaa;
-            }
-            /* External links */
-            .e {
-                text-decoration: none;
-            }
-            /* Text */
-            .t {
-                background-color: #fff;
-                display: block;
-                margin: 1ex;
-                padding: 1ex;
-            }
-            /* Images */
-            .i {
-                margin: 1ex;
-                max-height: 200px;
-            }
-        </style>
-        <script>
-            let dataSortedByDate;
-            let dataSortedByPopularity;
-            let chosenData = dataSortedByPopularity;
-            let limit = 1000;
+<head>
+  <meta name="viewport" content="width=device-width,initial-scale=1" charset="utf-8">
+  <title>Jon Henner's Twitter Archive</title>
+  <style>
+    @media screen and (min-width: 450px) {
+      #mobile-error {
+        display: none;
+      }
+    }
 
-            const loadData = async () => {
-                const response = await fetch('data/pruned.json');
-                dataSortedByDate = await response.json();
-                dataSortedByPopularity = [...dataSortedByDate];
+    #manifest-error {
+      display: none;
+    }
+  </style>
+  <link rel="icon" href="./assets/images/favicon.ico">
+</head>
 
-                dataSortedByPopularity.sort((a, b) => {
-                    return b['popularity'] - a['popularity'];
-                });
-                chosenData = dataSortedByPopularity;
-                showData();
-            };
+<body>
+  <div id="root"></div>
+  <div id="manifest-error">
+    <h3>Something went wrong, but don’t fret — let’s give it another shot</h3>
+    <p>You need to unzip your entire archive, not just individual folders, in order to view them here. If you keep
+      experiencing errors, please <a href="https://help.twitter.com/forms/privacy" target="_blank">fill out this
+        form.</a></p>
+  </div>
+  <div id="mobile-error">
+    <h3>Your archive isn’t available here.</h3>
+    <p>You need to view this on a desktop browser in order to see your archive.</p>
+  </div>
+  <script>function showManifestError() {
+      document.getElementById('root').style.display = 'none';
+      document.getElementById('manifest-error').style.display = 'block';
+    }</script>
+  <script src="./data/manifest.js" onerror="showManifestError()"></script>
+  <script src="assets/js/runtime.9662ea169e7e46b859ee.js"></script>
+  <script src="assets/js/modules.9072ed6e90fe38c485fe.js"></script>
+  <script src="assets/js/i18n.e27e67d39fcc91627cab.js"></script>
+  <script src="assets/js/main.0506aebee0a5b8f83a32.js"></script>
+  <script src="local-changes/postprocess.js" async></script>
+</body>
 
-            const formatTweet = (t) => {
-                let mediaMarkup = '';
-                if (t.media.length > 0) {
-                    for (let medium of t.media) {
-                        const mediaUrl = `data/tweets_media/${t.id}-${medium.id}`;
-                        if (medium.id.endsWith(".jpg")) {
-                            mediaMarkup += `<a href="${mediaUrl}"><img class="i" src="${mediaUrl}" /></a>`;
-                        }
-                        // if (medium.id.endsWith(".mp4")) {
-                        //     mediaMarkup += `<video width="320" height="240" controls><source src="${mediaUrl}" type="video/mp4"></video> `;
-                        // }
-                    }
-                }
-                return `<div class="t"><span class="txt">${t.text}</span> <span class="d">${t.created}</span> <a class="e" target="_blank" href="https://twitter.com/jmhenner/status/${t.id}">↗</a><div class="m">${mediaMarkup}</div><span></div>`;
-            };
-
-            const showData = async () => {
-                const contentEl = document.getElementById('content');
-                contentEl.innerHTML = '';
-
-                let output = [];
-                let count = 0;
-                for (let tweet of chosenData) {
-                    output.push(formatTweet(tweet));
-                    count += 1;
-                    if (limit > 0 && count > limit) {
-                        break;
-                    }
-                }
-                contentEl.innerHTML = output.join('');
-            };
-
-            const sortByDate = () => {
-                chosenData = dataSortedByDate;
-                showData();
-            };
-            const sortByPopularity = () => {
-                chosenData = dataSortedByPopularity;
-                showData();
-            };
-
-            const updateLimit = () => {
-                const checkbox = document.getElementById('limit');
-                console.log(checkbox.checked);
-                if (checkbox.checked) {
-                    limit = 1000;
-                } else {
-                    limit = 0;
-                }
-                showData();
-            }
-
-        </script>
-    </head>
-    <body onload="loadData()">
-        <div id="topbar">
-            <div id="settings">
-                Sort Tweets by:
-                <input type="radio" name="sort" id="popularity" checked onclick="sortByPopularity()" />
-                <label for="popularity">Popularity</label>
-                <input type="radio" name="sort" id="date" onclick="sortByDate()" />
-                <label for="date">Date</label>
-            </div>
-            <div id="more-settings">
-                <input type="checkbox" checked id="limit" onclick="updateLimit()" />
-                <label for="limit" onclick="updateLimit()">Show at most 1000 Tweets</span>
-            </div>
-            <div id="links"><a href="archive.html">Go to "Archive" view</a></div>
-        </div>
-        <div id="content">Loading...</div>
-    </body>
 </html>

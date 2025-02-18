@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="favicon.png" />
+        <style>
+            body {
+                background-color: #eee;
+                font-family: Arial;
+            }
+
+            #topbar {
+                align-items: center;
+                background-color: rgba(0, 0, 0, 0.1);
+                display: flex;
+                justify-content: space-between;
+                padding: 1ex;
+            }
+            #settings {
+                margin: 1ex;
+            }
+            #content {
+                margin: 0 auto;
+                max-width: 1200px;
+            }
+            /* Dates */
+            .d {
+                color: #aaa;
+            }
+            /* External links */
+            .e {
+                text-decoration: none;
+            }
+            /* Text */
+            .t {
+                background-color: #fff;
+                display: block;
+                margin: 1ex;
+                padding: 1ex;
+            }
+            /* Images */
+            .i {
+                margin: 1ex;
+                max-height: 200px;
+            }
+        </style>
+        <script>
+            let dataSortedByDate;
+            let dataSortedByPopularity;
+            let chosenData = dataSortedByPopularity;
+            let limit = 1000;
+
+            const loadData = async () => {
+                const response = await fetch('data/pruned.json');
+                dataSortedByDate = await response.json();
+                dataSortedByPopularity = [...dataSortedByDate];
+
+                dataSortedByPopularity.sort((a, b) => {
+                    return b['popularity'] - a['popularity'];
+                });
+                chosenData = dataSortedByPopularity;
+                showData();
+            };
+
+            const formatTweet = (t) => {
+                let mediaMarkup = '';
+                if (t.media.length > 0) {
+                    for (let medium of t.media) {
+                        const mediaUrl = `data/tweets_media/${t.id}-${medium.id}`;
+                        if (medium.id.endsWith(".jpg")) {
+                            mediaMarkup += `<a href="${mediaUrl}"><img class="i" src="${mediaUrl}" /></a>`;
+                        }
+                        // if (medium.id.endsWith(".mp4")) {
+                        //     mediaMarkup += `<video width="320" height="240" controls><source src="${mediaUrl}" type="video/mp4"></video> `;
+                        // }
+                    }
+                }
+                return `<div class="t"><span class="txt">${t.text}</span> <span class="d">${t.created}</span> <a class="e" target="_blank" href="https://twitter.com/jmhenner/status/${t.id}">↗</a><div class="m">${mediaMarkup}</div><span></div>`;
+            };
+
+            const showData = async () => {
+                const contentEl = document.getElementById('content');
+                contentEl.innerHTML = '';
+
+                let output = [];
+                let count = 0;
+                for (let tweet of chosenData) {
+                    output.push(formatTweet(tweet));
+                    count += 1;
+                    if (limit > 0 && count > limit) {
+                        break;
+                    }
+                }
+                contentEl.innerHTML = output.join('');
+            };
+
+            const sortByDate = () => {
+                chosenData = dataSortedByDate;
+                showData();
+            };
+            const sortByPopularity = () => {
+                chosenData = dataSortedByPopularity;
+                showData();
+            };
+
+            const updateLimit = () => {
+                const checkbox = document.getElementById('limit');
+                console.log(checkbox.checked);
+                if (checkbox.checked) {
+                    limit = 1000;
+                } else {
+                    limit = 0;
+                }
+                showData();
+            }
+
+        </script>
+    </head>
+    <body onload="loadData()">
+        <div id="topbar">
+            <div id="settings">
+                Sort Tweets by:
+                <input type="radio" name="sort" id="popularity" checked onclick="sortByPopularity()" />
+                <label for="popularity">Popularity</label>
+                <input type="radio" name="sort" id="date" onclick="sortByDate()" />
+                <label for="date">Date</label>
+            </div>
+            <div id="more-settings">
+                <input type="checkbox" checked id="limit" onclick="updateLimit()" />
+                <label for="limit" onclick="updateLimit()">Show at most 1000 Tweets</span>
+            </div>
+            <div id="links"><a href="archive.html">Go to "Archive" view</a></div>
+        </div>
+        <div id="content">Loading...</div>
+    </body>
+</html>
